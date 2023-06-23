@@ -1,0 +1,34 @@
+version: '3.8'
+
+networks:
+  joke-network:
+    name: joke-network
+services:
+  mongo:
+    image: mongo
+    container_name: bao_mongo
+    volumes:
+      - "./storage/data/mongodb:/data/db"
+    networks:
+      joke-network:
+    ports:
+      - "27017:27017"
+    hostname: bao_mongo
+    restart: always
+  postgres:
+    image: postgres
+    container_name: bao_postgres
+    environment:
+      - POSTGRES_DB=${PSQL_DATABASE}
+      - POSTGRES_USER=${PSQL_USERNAME}
+      - POSTGRES_PASSWORD=${PSQL_PASSWORD}
+    volumes:
+      - "./storage/data/postgres:/var/lib/postgresql/data"
+    networks:
+      - joke-network
+    ports:
+      - "${PSQL_PORT}:5432"
+    env_file:
+      - .env
+    hostname: bao_postgres
+    restart: always

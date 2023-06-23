@@ -1,0 +1,71 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Flags {
+  nsfw: Boolean!
+  religious: Boolean!
+  political: Boolean!
+  racist: Boolean!
+  sexist: Boolean!
+  explicit: Boolean!
+}
+
+type Joke {
+  error: Boolean!
+  category: String!
+  type: String!
+  joke: String
+  setup: String
+  delivery: String
+  flags: Flags!
+  safe: Boolean!
+  id: ID!
+  lang: String!
+}
+
+type User {
+  id: Int!
+  username: String!
+}
+
+type LoginResponse {
+  access_token: String!
+  user: User!
+}
+
+type Query {
+  anyJoke: Joke!
+  typeJoke(input: JokeTypeInput!): Joke!
+  users: [User!]!
+  user(username: String!): User!
+}
+
+input JokeTypeInput {
+  category: JokeCategoryEnum
+  type: JokeTypeEnum
+}
+
+enum JokeCategoryEnum {
+  ANY
+  MISC
+  PROG
+  DARK
+  PUN
+  SPOOKY
+  CHRISTMAS
+}
+
+enum JokeTypeEnum {
+  SINGLE
+  TWOPART
+}
+
+type Mutation {
+  login(loginUserInput: LoginUserInput!): LoginResponse!
+}
+
+input LoginUserInput {
+  username: String!
+  password: String!
+}
