@@ -12,21 +12,12 @@ import { JokeModule } from './joke/joke.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { typeOrmConfig } from './config/typeorm.config'
+import { JokeController } from './joke/joke.controller';
 
 @Module({
   imports: [
     ConfigModule.forRoot(config), 
-    TypeOrmModule.forRootAsync(typeOrmConfig),  
-    // TypeOrmModule.forRoot({
-    //   type: 'postgres',
-    //   host: 'localhost',
-    //   port: 5432,
-    //   username: 'postgres',
-    //   password: 'postgres123',
-    //   entities: [`${__dirname}/../**/*.entity.{js,ts}`],
-    //   database: 'db_bao',
-    //   synchronize: true,
-    // }),    
+    TypeOrmModule.forRootAsync(typeOrmConfig),   
     GraphQLModule.forRoot({
       autoSchemaFile: join(process.cwd(), 'schema.gql'),
       driver: ApolloDriver,

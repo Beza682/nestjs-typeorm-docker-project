@@ -25,7 +25,7 @@ type Joke {
 }
 
 type User {
-  id: Int!
+  id: String!
   username: String!
 }
 
@@ -63,9 +63,15 @@ enum JokeTypeEnum {
 
 type Mutation {
   login(loginUserInput: LoginUserInput!): LoginResponse!
+  signup(createUserInput: CreateUserInput!): LoginResponse!
 }
 
 input LoginUserInput {
+  username: String!
+  password: String!
+}
+
+input CreateUserInput {
   username: String!
   password: String!
 }

@@ -1,37 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserInput } from './qraphql/inputs/create-user.input';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import { RegTestEntity } from '../database/entities/test-reg.entity';
 
 @Injectable()
 export class UsersService {
-  private readonly users = [
-    {
-      id: 0,
-      username: 'admin',
-      password: 'admin'
-    },
-    {
-      id: 1,
-      username: 'bezrodin',
-      password: 'admin'
-    }
-  ];
-
-  create(createUserInput: CreateUserInput) {
-    const user = {
-      ...createUserInput,
-      id: this.users.length + 1,
-    }
-
-    this.users.push(user);
-
-    return user;
-  }
+  constructor(
+    @InjectRepository(RegTestEntity) private userRepsitory: Repository<RegTestEntity>
+    ){}
 
   findAll() {
-    return this.users;
+    return this.userRepsitory.find();
   }
 
   findOne(username: string) {
-    return this.users.find((user) => user.username === username);
+    return this.userRepsitory.findOneBy({username});
   }
 }

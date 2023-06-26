@@ -1,13 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 import { UsersService } from '../users/users.service';
-import { User } from '../users/types/user.type';
 import { LoginUserInput } from './inputs/login-user.input';
+import { RegTestEntity } from '../database/entities/test-reg.entity';
+import { CreateUserInput } from '../users/qraphql/inputs/create-user.input';
+import { LoginResponse } from './types/login-response.type';
+import { comparePassword, encodePassword } from '../utils/bcrypt';
 
 @Injectable()
 export class AuthService {
     constructor(
+        @InjectRepository(RegTestEntity) private userRepsitory: Repository<RegTestEntity>,
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService
         ){}
@@ -21,29 +27,55 @@ export class AuthService {
         return undefined;
     }
 
-    async login(logerUserInput: LoginUserInput){
-        const user = await this.usersService.findOne(logerUserInput.username);
+    async login(logerUserInput: LoginUserInput) : Promise<LoginResponse>{
+        const foundUser = await this.userRepsitory.findOne({where: {username: logerUserInput.username}});
 
-        const { password, ...result} = user;
+        if(!foundUser){
+            throw new BadRequestException(
+                `Wrong username or password`
+            )
+        }
 
-        return{
+        const passwordMatch = await comparePassword(logerUserInput.password, foundUser.password)
+
+        if(!passwordMatch){
+            throw new BadRequestException(
+                `Wrong username or password`
+            )
+        }
+
+        // const { password, ...result} = foundUser;
+
+        return {
             access_token:  this.jwtService.sign({
-                username: user.username,
-                sub: user.id
+                username: foundUser.username,
+                sub: foundUser.id
             }),
-            user: user
+            user: foundUser
         } 
     }
 
-    async login2(user: User){
-        console.log(user.username)
+    async create(userInput: CreateUserInput): Promise<LoginResponse>{
+        const findUser = await this.userRepsitory.findOneBy(userInput);
+        
+        if(findUser){
+            throw new BadRequestException(
+                `User "${findUser.username}" already exist`
+            )
+        }
 
+        const password = await encodePassword(userInput.password);
+        const newUser = await this.userRepsitory.create({ ...userInput, password });
+
+        this.userRepsitory.save(newUser);
+        // const { password, ...result} = newUser;
+  
         return{
             access_token:  this.jwtService.sign({
-                username: user.username,
-                sub: user.id
+                username: newUser.username,
+                sub: newUser.id
             }),
-            user
+            user: newUser
         } 
     }
 }
