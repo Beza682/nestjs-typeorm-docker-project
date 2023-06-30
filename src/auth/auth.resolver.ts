@@ -1,4 +1,5 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { ValidationPipe } from '@nestjs/common';
 
 import { LoginResponse } from './types/login-response.type';
 import { AuthService } from './auth.service';

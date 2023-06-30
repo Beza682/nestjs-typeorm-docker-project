@@ -17,7 +17,7 @@ async function bootstrap() {
   const port = configService.get('PORT') || DEFAULT_APP_PORT
   const hostname = configService.get('HOST') || DEFAULT_APP_HORT
 
-  // app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }))
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }))
 
   await app.listen(port, hostname, () =>
     logger.log(`Server running at ${hostname}:${port}`),

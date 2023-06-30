@@ -3,7 +3,6 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { UsersService } from '../users/users.service';
 import { LoginUserInput } from './inputs/login-user.input';
 import { RegTestEntity } from '../database/entities/test-reg.entity';
 import { CreateUserInput } from '../users/qraphql/inputs/create-user.input';
@@ -14,18 +13,8 @@ import { comparePassword, encodePassword } from '../utils/bcrypt';
 export class AuthService {
     constructor(
         @InjectRepository(RegTestEntity) private userRepsitory: Repository<RegTestEntity>,
-        private readonly usersService: UsersService,
         private readonly jwtService: JwtService
         ){}
-    
-    async validateUser(username: string, password: string): Promise<any>{
-        const user = await this.usersService.findOne(username);
-        if(user && user.password === password){
-            const { password, ...result} = user;
-            return user;
-        }
-        return undefined;
-    }
 
     async login(logerUserInput: LoginUserInput) : Promise<LoginResponse>{
         const foundUser = await this.userRepsitory.findOne({where: {username: logerUserInput.username}});
@@ -44,8 +33,6 @@ export class AuthService {
             )
         }
 
-        // const { password, ...result} = foundUser;
-
         return {
             access_token:  this.jwtService.sign({
                 username: foundUser.username,
@@ -56,8 +43,7 @@ export class AuthService {
     }
 
     async create(userInput: CreateUserInput): Promise<LoginResponse>{
-        const findUser = await this.userRepsitory.findOneBy(userInput);
-        
+        const findUser = await this.userRepsitory.findOne({where: {username: userInput.username}});
         if(findUser){
             throw new BadRequestException(
                 `User "${findUser.username}" already exist`
@@ -67,15 +53,14 @@ export class AuthService {
         const password = await encodePassword(userInput.password);
         const newUser = await this.userRepsitory.create({ ...userInput, password });
 
-        this.userRepsitory.save(newUser);
-        // const { password, ...result} = newUser;
+        const user = await this.userRepsitory.save(newUser);
   
         return{
             access_token:  this.jwtService.sign({
-                username: newUser.username,
-                sub: newUser.id
+                username: user.username,
+                sub: user.id
             }),
-            user: newUser
+            user: user
         } 
     }
 }

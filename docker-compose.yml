@@ -5,7 +5,7 @@ networks:
     name: joke-network
 services:
   mongo:
-    image: mongo
+    image: mongo:7.0.0-rc5
     container_name: bao_mongo
     volumes:
       - "./storage/data/mongodb:/data/db"
@@ -16,7 +16,7 @@ services:
     hostname: bao_mongo
     restart: always
   postgres:
-    image: postgres
+    image: postgres:15.3
     container_name: bao_postgres
     environment:
       - POSTGRES_DB=${PSQL_DATABASE}

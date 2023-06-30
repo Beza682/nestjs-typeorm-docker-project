@@ -11,10 +11,12 @@ export class UsersService {
     ){}
 
   findAll() {
-    return this.userRepsitory.find();
+    return this.userRepsitory.find({
+      take: 20
+    });
   }
 
-  findOne(username: string) {
+  findOneByUsername(username: string) {
     return this.userRepsitory.findOneBy({username});
   }
 }

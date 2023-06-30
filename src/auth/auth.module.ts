@@ -6,7 +6,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
 import { JwtStrategy } from './jwt/jwt.strategy';
-import { UsersModule } from '../users/users.module';
 import { RegTestEntity } from '../database/entities/test-reg.entity';
 
 
@@ -18,7 +17,6 @@ import { RegTestEntity } from '../database/entities/test-reg.entity';
        secret: 'process.env.JWT_SECRET' //TODO configService.get<string>('JWT_SECRET') and process.env.JWT_SECRET not working 
     }),
     PassportModule,
-    UsersModule
   ],
   providers: [AuthService, AuthResolver, JwtStrategy]
 })
